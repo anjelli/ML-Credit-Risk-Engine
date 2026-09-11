@@ -2,8 +2,6 @@
 
 A credit-risk decision-support project built around a supervised loan-default model and a deterministic policy layer.
 
-> **Status:** the repository is being rebuilt around original implementation work. The earlier notebook and result plots from `JensBender/loan-default-prediction` have been removed from the project codebase; they are not used as evidence of results produced by this project.
-
 ## What this project is
 
 The engine is designed as a small, auditable pipeline:
