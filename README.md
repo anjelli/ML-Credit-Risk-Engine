@@ -98,16 +98,3 @@ The agentic component will add workflow/state management rather than pretending 
 └── LICENSE
 ```
 
-The application source directories referenced by the old Dockerfile are not currently present. The deployment configuration will be repaired when the application implementation is added rather than leaving a Docker build that points to missing files.
-
-## Responsible use
-
-This is a research / portfolio project and is not a production lending system. A real credit-risk deployment would require representative data, leakage and bias analysis, calibration, fairness evaluation, monitoring, governance, regulatory review, and human oversight.
-
-## Attribution
-
-The earlier repository state incorporated material from `JensBender/loan-default-prediction`. That material is no longer used as this project's model implementation or performance evidence. The public Kaggle dataset remains an appropriate source dataset for an independently implemented model.
-
-## License
-
-See `LICENSE` for the repository license.
