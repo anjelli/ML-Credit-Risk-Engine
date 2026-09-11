@@ -31,27 +31,27 @@ The dataset contains demographic, financial, employment, housing, and geographic
 
 **Correlation structure**
 
-![Correlation Heatmap](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/correlation_heatmap.png)
+![Correlation Heatmap](https://github.com/JensBender/loan-default-prediction/blob/main/images/correlation_heatmap.png?raw=true)
 
 **Numerical distributions**
 
-![Numerical Distributions](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/numerical_distributions_histograms.png)
+![Numerical Distributions](https://github.com/JensBender/loan-default-prediction/blob/main/images/numerical_distributions_histograms.png?raw=true)
 
 **Categorical frequencies**
 
-![Categorical Frequencies](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/categorical_frequencies_barplots.png)
+![Categorical Frequencies](https://github.com/JensBender/loan-default-prediction/blob/main/images/categorical_frequencies_barplots.png?raw=true)
 
 **Numerical relationships**
 
-![Numerical Relationships](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/numerical_relationships_scatterplots.png)
+![Numerical Relationships](https://github.com/JensBender/loan-default-prediction/blob/main/images/numerical_relationships_scatterplots.png?raw=true)
 
 **Numerical vs. categorical relationships**
 
-![Numerical-Categorical Relationships](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/numerical_categorical_relationships_barplots.png)
+![Numerical-Categorical Relationships](https://github.com/JensBender/loan-default-prediction/blob/main/images/numerical_categorical_relationships_barplots.png?raw=true)
 
 **Categorical relationships**
 
-![Categorical Relationships](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/categorical_relationships_groupedbarplots.png)
+![Categorical Relationships](https://github.com/JensBender/loan-default-prediction/blob/main/images/categorical_relationships_groupedbarplots.png?raw=true)
 
 ### Baseline model comparison
 
@@ -59,9 +59,9 @@ Eight baseline classifiers were evaluated using **PR-AUC** as the primary metric
 
 The original analysis compared four outlier-handling strategies and proceeded without outlier handling because it did not meaningfully improve PR-AUC.
 
-![Baseline AUC-PR Comparison](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/aucpr_comparison_baseline.png)
+![Baseline AUC-PR Comparison](https://github.com/JensBender/loan-default-prediction/blob/main/images/aucpr_comparison_baseline.png?raw=true)
 
-![Baseline Precision-Recall Curves](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/precision_recall_curves_baseline.png)
+![Baseline Precision-Recall Curves](https://github.com/JensBender/loan-default-prediction/blob/main/images/precision_recall_curves_baseline.png?raw=true)
 
 Top baseline performers selected for tuning were Random Forest (**PR-AUC 0.62**), XGBoost (**0.56**), K-Nearest Neighbors (**0.56**), and Decision Tree (**0.47**).
 
@@ -69,11 +69,11 @@ Top baseline performers selected for tuning were Random Forest (**PR-AUC 0.62**)
 
 Hyperparameters were tuned with randomized search and 5-fold cross-validation. On validation data, Random Forest achieved the highest PR-AUC (**0.62**), followed by XGBoost (**0.61**).
 
-![Tuned Precision-Recall Curves](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/precision_recall_curves_tuned.png)
+![Tuned Precision-Recall Curves](https://github.com/JensBender/loan-default-prediction/blob/main/images/precision_recall_curves_tuned.png?raw=true)
 
 The operating threshold was then optimized for the minority class, targeting **recall ≥ 0.80** and **precision ≥ 0.40** while maximizing F1-score.
 
-![Random Forest Metrics by Threshold](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/rf_metrics_by_threshold_tuned.png)
+![Random Forest Metrics by Threshold](https://github.com/JensBender/loan-default-prediction/blob/main/images/rf_metrics_by_threshold_tuned.png?raw=true)
 
 The tuned validation comparison was:
 
@@ -86,7 +86,7 @@ The tuned validation comparison was:
 
 Random Forest was selected over XGBoost because it combined strong validation performance with the smallest train-validation PR-AUC gap (**0.06** vs. **0.13** for XGBoost).
 
-![Threshold-Optimized Overfitting Analysis](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/overfitting_tuned_thresholds.png)
+![Threshold-Optimized Overfitting Analysis](https://github.com/JensBender/loan-default-prediction/blob/main/images/overfitting_tuned_thresholds.png?raw=true)
 
 ### Final model
 
@@ -121,13 +121,13 @@ Test-set classification report:
 
 **Confusion matrix**
 
-![Random Forest Test Confusion Matrix](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/rf_confusion_matrix_test.png)
+![Random Forest Test Confusion Matrix](https://github.com/JensBender/loan-default-prediction/blob/main/images/rf_confusion_matrix_test.png?raw=true)
 
 **Final feature importance**
 
 The original analysis identified **income, age, and state default rate** as the strongest features, with experience and current job years contributing moderately.
 
-![Random Forest Feature Importance](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/rf_feature_importance_final.png)
+![Random Forest Feature Importance](https://github.com/JensBender/loan-default-prediction/blob/main/images/rf_feature_importance_final.png?raw=true)
 
 ## Data
 
