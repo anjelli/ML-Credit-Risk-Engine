@@ -6,53 +6,53 @@ An end-to-end machine learning application for loan default prediction and credi
 
 ### Numerical distributions
 
-![Numerical Distributions](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/numerical_distributions_histograms.png)
+![Numerical Distributions](https://media.githubusercontent.com/media/JensBender/loan-default-prediction/main/images/numerical_distributions_histograms.png)
 
 ### Categorical frequencies
 
-![Categorical Frequencies](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/categorical_frequencies_barplots.png)
+![Categorical Frequencies](https://media.githubusercontent.com/media/JensBender/loan-default-prediction/main/images/categorical_frequencies_barplots.png)
 
 ### Numerical-numerical relationships
 
-![Numerical Relationships](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/numerical_relationships_scatterplots.png)
+![Numerical Relationships](https://media.githubusercontent.com/media/JensBender/loan-default-prediction/main/images/numerical_relationships_scatterplots.png)
 
 ### Numerical-categorical relationships
 
-![Numerical-Categorical Relationships](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/numerical_categorical_relationships_barplots.png)
+![Numerical-Categorical Relationships](https://media.githubusercontent.com/media/JensBender/loan-default-prediction/main/images/numerical_categorical_relationships_barplots.png)
 
 ### Categorical-categorical relationships
 
-![Categorical-Categorical Relationships](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/categorical_relationships_groupedbarplots.png)
+![Categorical-Categorical Relationships](https://media.githubusercontent.com/media/JensBender/loan-default-prediction/main/images/categorical_relationships_groupedbarplots.png)
 
 ### Correlation heatmap
 
-<img src="https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/correlation_heatmap.png" alt="Correlation Heatmap" width="850">
+<img src="https://media.githubusercontent.com/media/JensBender/loan-default-prediction/main/images/correlation_heatmap.png" alt="Correlation Heatmap" width="850">
 
 ## Modeling
 
 ### Baseline model comparison
 
-![AUC-PR Comparison](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/aucpr_comparison_baseline.png)
+![AUC-PR Comparison](https://media.githubusercontent.com/media/JensBender/loan-default-prediction/main/images/aucpr_comparison_baseline.png)
 
-![Baseline Precision-Recall Curves](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/precision_recall_curves_baseline.png)
+![Baseline Precision-Recall Curves](https://media.githubusercontent.com/media/JensBender/loan-default-prediction/main/images/precision_recall_curves_baseline.png)
 
 ### Hyperparameter tuning
 
-![Tuned Precision-Recall Curves](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/precision_recall_curves_tuned.png)
+![Tuned Precision-Recall Curves](https://media.githubusercontent.com/media/JensBender/loan-default-prediction/main/images/precision_recall_curves_tuned.png)
 
 ### Threshold optimization
 
-![Random Forest Threshold Metrics](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/rf_metrics_by_threshold_tuned.png)
+![Random Forest Threshold Metrics](https://media.githubusercontent.com/media/JensBender/loan-default-prediction/main/images/rf_metrics_by_threshold_tuned.png)
 
-![XGBoost Threshold Metrics](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/xgb_metrics_by_threshold_tuned.png)
+![XGBoost Threshold Metrics](https://media.githubusercontent.com/media/JensBender/loan-default-prediction/main/images/xgb_metrics_by_threshold_tuned.png)
 
-![Decision Tree Threshold Metrics](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/tree_metrics_by_threshold_tuned.png)
+![Decision Tree Threshold Metrics](https://media.githubusercontent.com/media/JensBender/loan-default-prediction/main/images/tree_metrics_by_threshold_tuned.png)
 
-![KNN Threshold Metrics](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/knn_metrics_by_threshold_tuned.png)
+![KNN Threshold Metrics](https://media.githubusercontent.com/media/JensBender/loan-default-prediction/main/images/knn_metrics_by_threshold_tuned.png)
 
 ### Overfitting analysis
 
-![Overfitting Analysis](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/overfitting_tuned_thresholds.png)
+![Overfitting Analysis](https://media.githubusercontent.com/media/JensBender/loan-default-prediction/main/images/overfitting_tuned_thresholds.png)
 
 ## Final Model Results
 
@@ -66,11 +66,11 @@ The final workflow uses a Random Forest classifier with an optimized decision th
 
 ### Test confusion matrix
 
-![Random Forest Confusion Matrix](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/rf_confusion_matrix_test.png)
+![Random Forest Confusion Matrix](https://media.githubusercontent.com/media/JensBender/loan-default-prediction/main/images/rf_confusion_matrix_test.png)
 
 ### Feature importance
 
-![Random Forest Feature Importance](https://raw.githubusercontent.com/JensBender/loan-default-prediction/main/images/rf_feature_importance_final.png)
+![Random Forest Feature Importance](https://media.githubusercontent.com/media/JensBender/loan-default-prediction/main/images/rf_feature_importance_final.png)
 
 ## Project Overview
 
