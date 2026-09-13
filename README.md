@@ -1,98 +1,184 @@
 # ML Credit Risk Engine
 
-A reproducible machine-learning pipeline for loan-default prediction and credit-risk analysis.
+A production-style machine learning pipeline for **loan default prediction**, designed around reproducible preprocessing, class-imbalance-aware evaluation, threshold optimization, and auditable risk decisions.
 
-The project separates **risk estimation** from **decision policy** so the model produces a probability of default while a separate threshold layer determines how that score is operationalized.
+## At a glance
 
-## Overview
+| Component | Implementation |
+|---|---|
+| Task | Binary loan-default classification |
+| Dataset | 252,000 applicant records |
+| Target | `Risk Flag` |
+| Primary metric | Average Precision / PR-AUC |
+| Model | Random Forest |
+| Preprocessing | `Pipeline` + `ColumnTransformer` |
+| Evaluation | PR-AUC, precision, recall, F1, confusion matrix |
+| Decisioning | Validation-set threshold optimization |
+| Artifact | Serialized inference pipeline |
+| Tests | `pytest` |
+
+## Pipeline
 
 ```text
-Raw applicant data
-       |
-       v
-Schema validation
-       |
-       v
-Train / validation / test split
-       |
-       v
-Preprocessing
-  - numeric scaling
-  - categorical encoding
-       |
-       v
-Random Forest classifier
-       |
-       v
-Probability of default
-       |
-       v
-Validation-based threshold selection
-       |
-       +----> approve / review / reject policy
-       |
-       v
-Metrics + plots + audit-ready artifacts
+                    ┌─────────────────────┐
+                    │ Raw Applicant Data  │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │ Schema / Data Checks│
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                 ┌────────────────────────────┐
+                 │ Leakage-safe Preprocessing │
+                 │                            │
+                 │ Numeric → scaling          │
+                 │ Categorical → one-hot      │
+                 └─────────────┬──────────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │ Random Forest Model │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │ Default Probability │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                  ┌──────────────────────────┐
+                  │ Validation Threshold     │
+                  │ Optimization             │
+                  └────────────┬─────────────┘
+                               │
+                    ┌──────────┴──────────┐
+                    ▼                     ▼
+              Risk score             Decision policy
+                    │                     │
+                    └──────────┬──────────┘
+                               ▼
+                    Evaluation + Artifacts
 ```
 
-## What is implemented
+## Why this project is structured this way
 
-- Deterministic, stratified train/validation/test splitting.
-- Leakage-safe preprocessing with `ColumnTransformer`.
-- Numeric standardization and categorical one-hot encoding.
-- Class-imbalance-aware Random Forest modeling.
-- PR-AUC as the primary ranking metric.
-- Threshold selection against explicit precision/recall constraints.
-- Test-set precision, recall, F1 and confusion-matrix evaluation.
-- Reusable plotting utilities for PR curves, threshold trade-offs and confusion matrices.
-- Serialized inference pipeline via `joblib`.
-- Unit tests for the evaluation and threshold-selection layer.
+Loan default is an imbalanced classification problem, so accuracy alone can hide poor detection of the default class. The pipeline therefore uses **Average Precision (PR-AUC)** as its main ranking metric and evaluates the operating threshold separately using precision, recall and F1.
+
+The model produces a probability. The operating threshold is a separate decision layer. This makes the model easier to evaluate, tune and audit without embedding business policy inside the classifier.
 
 ## Dataset
 
-The project targets the public **Loan Prediction Based on Customer Behavior** dataset. The data contains applicant-level demographic, financial, employment, housing and geographic variables with `Risk Flag` as the binary target. The reference dataset contains 252,000 records and an imbalanced default class, making precision-recall analysis more informative than accuracy alone. fileciteturn5file0
+The project uses the **Loan Prediction Based on Customer Behavior** dataset containing applicant demographic, financial, employment, housing and geographic attributes.
 
-Expected raw columns:
+Core fields include:
 
-`Income`, `Age`, `Experience`, `Profession`, `Married/Single`, `House_Ownership`, `Car_Ownership`, `CURRENT_JOB_YRS`, `CURRENT_HOUSE_YRS`, `City`, `State`, `Risk Flag`
+- Income
+- Age
+- Experience
+- Profession
+- Marital status
+- House ownership
+- Car ownership
+- Current job years
+- Current house years
+- City
+- State
+- `Risk Flag` — binary default indicator
 
-Place the CSV at:
+The expected dataset location is:
 
 ```text
 data/training_data.csv
 ```
 
-## Modeling approach
+The dataset is not committed to the repository by default because of its size and redistribution considerations.
+
+## Modeling
 
 ### Preprocessing
 
-The feature pipeline keeps transformation inside a scikit-learn `Pipeline` / `ColumnTransformer`, preventing preprocessing logic from being accidentally applied differently at training and inference time.
+All transformations are encapsulated inside the training pipeline rather than performed as disconnected notebook operations.
 
-Numerical variables are standardized. Categorical variables use one-hot encoding with `handle_unknown="ignore"`, allowing inference on previously unseen categories without breaking the pipeline.
+- Numeric features are standardized with `StandardScaler`.
+- Categorical features are one-hot encoded with `handle_unknown="ignore"`.
+- Train/validation/test splits are stratified and deterministic.
+- The fitted preprocessing graph is serialized together with the classifier.
 
-### Classifier
+This ensures training and inference use the same transformations.
 
-The current implementation uses a class-weighted `RandomForestClassifier` with a fixed random seed for reproducibility. The classifier is intentionally wrapped with preprocessing and saved as one inference artifact.
+### Model
 
-### Evaluation
+The baseline production candidate is a class-weighted `RandomForestClassifier` with a fixed random seed. The implementation is intentionally modular so alternative classifiers can be benchmarked without rewriting the preprocessing layer.
 
-The main evaluation metric is **Average Precision / PR-AUC**, appropriate for an imbalanced binary default target. Threshold-dependent metrics include:
+### Threshold optimization
 
-| Metric | Purpose |
-| --- | --- |
-| PR-AUC | Overall ranking quality for the positive/default class |
-| Precision | Share of flagged applications that are actual defaults |
-| Recall | Share of actual defaults detected |
-| F1 | Balance between precision and recall |
-| Confusion matrix | Error decomposition at the operating threshold |
+The classifier's probability output is not treated as a decision by itself. The operating threshold is selected using the validation set against explicit precision/recall constraints, then frozen before the test set is evaluated.
 
-The decision threshold is selected on validation data and then frozen before test evaluation.
+This prevents the test set from influencing the decision rule.
 
-## Results
+## Results and visual analysis
 
-The repository includes the evaluation framework required to generate the result figures below. The README intentionally does not hard-code model performance that has not been reproduced from the current source tree.
+The repository is organized to retain the complete model-analysis workflow rather than only a single score.
 
-After training, the generated artifacts are written to `artifacts/`:
+### Model comparison
+
+![Baseline model comparison](images/aucpr_comparison_baseline.png)
+
+### Precision-recall analysis
+
+![Precision recall curves](images/precision_recall_curves_baseline.png)
+
+![Tuned precision recall curves](images/precision_recall_curves_tuned.png)
+
+### Threshold analysis
+
+![Threshold metrics](images/overfitting_tuned_thresholds.png)
+
+### Final model diagnostics
+
+![Confusion matrix](images/rf_confusion_matrix_test.png)
+
+![Feature importance](images/rf_feature_importance_final.png)
+
+### Exploratory data analysis
+
+![Correlation heatmap](images/correlation_heatmap.png)
+
+![Numerical distributions](images/numerical_distributions_histograms.png)
+
+![Categorical frequencies](images/categorical_frequencies_barplots.png)
+
+![Numerical relationships](images/numerical_relationships_scatterplots.png)
+
+![Numerical categorical relationships](images/numerical_categorical_relationships_barplots.png)
+
+![Categorical relationships](images/categorical_relationships_groupedbarplots.png)
+
+The image set covers the main analytical stages: distributional analysis, relationships between variables, correlation structure, model comparison, precision-recall behavior, threshold selection, confusion-matrix diagnostics and feature importance.
+
+## Reproducibility
+
+Install the project dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Install development/test dependencies:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+Place the dataset at `data/training_data.csv`, then run:
+
+```bash
+python scripts/train_model.py --data data/training_data.csv
+```
+
+Generated artifacts are written to:
 
 ```text
 artifacts/
@@ -104,40 +190,7 @@ artifacts/
     └── threshold_metrics.png
 ```
 
-### Evaluation visuals
-
-#### Precision-recall performance
-
-![Precision-Recall Curve](artifacts/figures/precision_recall_curve.png)
-
-#### Confusion matrix at selected threshold
-
-![Confusion Matrix](artifacts/figures/confusion_matrix.png)
-
-#### Threshold trade-offs
-
-![Threshold Metrics](artifacts/figures/threshold_metrics.png)
-
-### Additional analysis to retain with the project
-
-The project structure is designed to accommodate the broader analysis expected of a serious credit-risk workflow: model comparison, threshold optimization, feature importance, correlation analysis, categorical distributions, numerical distributions, and numerical/categorical relationship plots. The reference implementation demonstrates these analysis categories and reports PR-AUC, class-1 precision/recall/F1, confusion matrix and feature importance as its core outputs. fileciteturn5file0
-
-## Reproduce the model
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-pip install -r requirements-dev.txt
-```
-
-Run training:
-
-```bash
-python scripts/train_model.py --data data/training_data.csv
-```
-
-Run tests:
+Run the test suite:
 
 ```bash
 pytest
@@ -147,45 +200,58 @@ pytest
 
 ```text
 ML-Credit-Risk-Engine/
-├── README.md
-├── Dockerfile
-├── requirements.txt
-├── requirements-dev.txt
-├── requirements-notebook.txt
-├── requirements-test.txt
-├── pytest.ini
-├── loan_default_prediction.ipynb
-├── scripts/
-│   └── train_model.py
+│
+├── data/                         # Local dataset; ignored by Git
+├── images/                       # EDA + model-result visualizations
+│
 ├── src/
 │   ├── __init__.py
-│   ├── data.py
-│   ├── modeling.py
-│   └── plots.py
+│   ├── data.py                   # Data loading and validation
+│   ├── modeling.py               # Pipeline, model and evaluation logic
+│   └── plots.py                  # Reusable evaluation plots
+│
+├── scripts/
+│   └── train_model.py            # Reproducible training entry point
+│
 ├── tests/
-│   └── test_modeling.py
-├── images/
-│   └── README.md
-└── LICENSE
+│   └── test_modeling.py          # Unit tests
+│
+├── loan_default_prediction.ipynb # Exploratory analysis notebook
+├── requirements.txt
+├── requirements-dev.txt
+├── requirements-test.txt
+├── requirements-notebook.txt
+├── pytest.ini
+├── Dockerfile
+├── start.sh
+├── .github/workflows/quality.yml
+├── .gitignore
+├── .dockerignore
+├── LICENSE
+└── README.md
 ```
 
-## Design principles
+## Engineering decisions
 
-### Model score is not the policy
+### Leakage control
 
-The classifier estimates default probability. A separate policy layer determines what score range maps to review or other operational actions. This prevents business rules from being silently buried inside the model.
+Preprocessing is fitted only within the training pipeline. Threshold selection is performed on validation data, while the test set remains a final unseen evaluation set.
 
-### Reproducibility over notebook-only execution
+### Imbalanced classification
 
-The notebook remains useful for exploration, but the core modeling logic now lives in importable Python modules and a command-line training script.
+PR-AUC is prioritized over raw accuracy because the default class is substantially smaller than the non-default class.
 
-### Metrics before claims
+### Reusable components
 
-Performance values belong in the README only after the current implementation has produced them on a clearly defined validation/test split. This avoids stale or copied numbers surviving after code changes.
+Training, preprocessing, evaluation and plotting logic live in Python modules under `src/`. The notebook is retained for exploratory work rather than being the only executable representation of the project.
 
-## Limitations and responsible use
+### Auditability
 
-This is a machine-learning research / portfolio pipeline, not an autonomous lending system. Credit decisions are high-impact decisions and should not be made from a model score alone. Any production use would require additional validation, calibration, fairness analysis, monitoring, governance, and review against applicable laws and institutional policy.
+Model probability, decision threshold and classification outcome are conceptually separated. This makes changes to operating policy traceable without retraining the underlying classifier.
+
+## Limitations
+
+This is a credit-risk modeling project, not an autonomous lending system. Historical applicant data can encode socioeconomic and geographic biases. Any real deployment would require calibration, fairness testing, drift monitoring, governance controls, explainability review and human oversight.
 
 ## License
 
