@@ -1,59 +1,60 @@
-"""Publication-ready evaluation plots."""
+"""Plotting utilities for credit-risk model evaluation."""
 
 from __future__ import annotations
 
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
 from sklearn.metrics import ConfusionMatrixDisplay, PrecisionRecallDisplay, precision_recall_curve
 
 
-def save_precision_recall_curve(y_true, probabilities, output_path: str | Path) -> None:
-    """Save a precision-recall curve."""
-    output_path = Path(output_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
+def save_evaluation_plots(model, X_test, y_test, threshold: float, output_dir: Path) -> None:
+    """Generate compact, publication-ready evaluation figures."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+    probabilities = model.predict_proba(X_test)[:, 1]
+
+    precision, recall, thresholds = precision_recall_curve(y_test, probabilities)
     fig, ax = plt.subplots(figsize=(7, 5))
-    PrecisionRecallDisplay.from_predictions(y_true, probabilities, ax=ax)
-    ax.set_title("Precision-Recall Curve")
+    ax.plot(recall, precision)
+    ax.set(xlabel="Recall", ylabel="Precision", title="Precision-Recall Curve")
+    ax.grid(alpha=0.25)
     fig.tight_layout()
-    fig.savefig(output_path, dpi=180, bbox_inches="tight")
+    fig.savefig(output_dir / "precision_recall_curve.png", dpi=180)
     plt.close(fig)
 
-
-def save_confusion_matrix(y_true, probabilities, threshold: float, output_path: str | Path) -> None:
-    """Save a thresholded confusion matrix."""
-    output_path = Path(output_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    predictions = (np.asarray(probabilities) >= threshold).astype(int)
+    predictions = probabilities >= threshold
     fig, ax = plt.subplots(figsize=(6, 5))
-    ConfusionMatrixDisplay.from_predictions(y_true, predictions, display_labels=["No Default", "Default"], ax=ax)
-    ax.set_title(f"Confusion Matrix (threshold={threshold:.2f})")
+    ConfusionMatrixDisplay.from_predictions(y_test, predictions, ax=ax, values_format=",d")
+    ax.set_title(f"Confusion Matrix (threshold = {threshold:.3f})")
     fig.tight_layout()
-    fig.savefig(output_path, dpi=180, bbox_inches="tight")
+    fig.savefig(output_dir / "confusion_matrix.png", dpi=180)
     plt.close(fig)
 
+    candidate_thresholds = thresholds[:: max(1, len(thresholds) // 100)]
+    if len(candidate_thresholds) == 0:
+        candidate_thresholds = [threshold]
 
-def save_threshold_curve(y_true, probabilities, output_path: str | Path) -> None:
-    """Save precision/recall/F1 as a function of threshold."""
-    from sklearn.metrics import f1_score, precision_score, recall_score
+    precisions, recalls, f1s = [], [], []
+    for t in candidate_thresholds:
+        pred = probabilities >= t
+        tp = ((pred == 1) & (y_test.to_numpy() == 1)).sum()
+        fp = ((pred == 1) & (y_test.to_numpy() == 0)).sum()
+        fn = ((pred == 0) & (y_test.to_numpy() == 1)).sum()
+        p = tp / (tp + fp) if tp + fp else 0.0
+        r = tp / (tp + fn) if tp + fn else 0.0
+        f = 2 * p * r / (p + r) if p + r else 0.0
+        precisions.append(p)
+        recalls.append(r)
+        f1s.append(f)
 
-    output_path = Path(output_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    thresholds = np.linspace(0.01, 0.99, 99)
-    precision, recall, f1 = [], [], []
-    for threshold in thresholds:
-        predictions = (np.asarray(probabilities) >= threshold).astype(int)
-        precision.append(precision_score(y_true, predictions, zero_division=0))
-        recall.append(recall_score(y_true, predictions, zero_division=0))
-        f1.append(f1_score(y_true, predictions, zero_division=0))
-
-    fig, ax = plt.subplots(figsize=(7, 5))
-    ax.plot(thresholds, precision, label="Precision")
-    ax.plot(thresholds, recall, label="Recall")
-    ax.plot(thresholds, f1, label="F1")
-    ax.set(xlabel="Decision threshold", ylabel="Score", title="Metrics by Decision Threshold")
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.plot(candidate_thresholds, precisions, label="Precision")
+    ax.plot(candidate_thresholds, recalls, label="Recall")
+    ax.plot(candidate_thresholds, f1s, label="F1")
+    ax.axvline(threshold, linestyle="--", label=f"Selected = {threshold:.3f}")
+    ax.set(xlabel="Decision threshold", ylabel="Score", title="Threshold Trade-offs")
     ax.legend()
+    ax.grid(alpha=0.25)
     fig.tight_layout()
-    fig.savefig(output_path, dpi=180, bbox_inches="tight")
+    fig.savefig(output_dir / "threshold_metrics.png", dpi=180)
     plt.close(fig)
